@@ -14,7 +14,7 @@
     <div id="input">
         <!--textarea is placeholder/used by codemirror-->
 
-        <textarea class="input" id="input-box"></textarea>
+        <textarea class="input" id="input-box">@ViewData["text"]</textarea>
     </div>
     <div class="resize-bar">
 
@@ -51,7 +51,7 @@
         <br />
         <p class="menu-list-title">Share...</p>
         <ul class="menu-list share-list">
-            <li>Get Sharable Link (Readonly)</li>
+            <li><button id="share-link-read">Get Sharable Link (Readonly)</button></li>
             <li>Get Sharable Link (Read/Write)</li>
         </ul>
         <hr />

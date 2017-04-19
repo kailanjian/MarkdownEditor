@@ -69,6 +69,24 @@ $(function () {
         }
     });
 
+
+    $("#share-link-read").click(function () {
+        let text = editor.getValue();
+        $.ajax({
+            url: "/Home/SaveNewDocument",
+            method: "POST",
+            contentType: "application/json;charset=utf-8",
+            data: '"' + text + '"'
+        }).error(function (xhr, textStatus, errorThrown) {
+            console.log(JSON.stringify(errorThrown));
+            console.log(textStatus);
+        }).done(function (data) {
+            console.log(JSON.stringify(data));
+            let base_url = window.location.host;
+            let path = "/Home/Document/" + data;
+            alert("your link is: " + base_url + path)
+        });
+    });
     //bind title rename
     bindTitleRename();
 
