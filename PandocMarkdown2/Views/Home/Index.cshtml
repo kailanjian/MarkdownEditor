@@ -1,0 +1,65 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="main-top">
+    <div class="menu-open-button"><i class="glyphicon glyphicon-menu-right" ></i></div>
+    <div class="document-title">
+        <p id="document-title-display">Untitled</p>
+        <input id="document-title-input" type="text" style="display: none" value="Untitled"/>
+    </div>
+    <div class="title"><i>Pandoc Markdown</i></div>
+</div>
+<div class="main">
+    <div id="input">
+        <!--textarea is placeholder/used by codemirror-->
+
+        <textarea class="input" id="input-box"></textarea>
+    </div>
+    <div class="resize-bar">
+
+    </div>
+    <div id="output">
+        <div class="html-container">
+            <!--parsed output goes here-->
+
+        </div>
+    </div>
+</div>
+<div class="main-bottom"></div>
+<div class="menu">
+    <div class="menu-top">
+        <span class="menu-title">Menu</span>
+        <span class="menu-close-button"><i class="glyphicon glyphicon-menu-left"></i></span>
+    </div>
+    <br />
+    <div class="menu-body">
+        <p class="menu-list-title save-title">Save as...</p>
+        <ul class="menu-list save-list">
+            <li><button id="save-md">Markdown Text File</button></li>
+            <li>LaTeX PDF</li>
+            <li>Word DOCX File</li>
+        </ul>
+        <br />
+        <p class="menu-list-title open-title">Open...</p>
+        <ul class="menu-list open-list">
+            <li><button id="open-md">Markdown Text File</button></li>
+            <input id="markdown-file-input" type="file" name="markdown-file-input" style="display: none;" />
+            <li>From Google Drive</li>
+            <li>From URL</li>
+        </ul>
+        <br />
+        <p class="menu-list-title">Share...</p>
+        <ul class="menu-list share-list">
+            <li>Get Sharable Link (Readonly)</li>
+            <li>Get Sharable Link (Read/Write)</li>
+        </ul>
+        <hr />
+        <p class="menu-list-title">Recent</p>
+        <ul class="menu-list">
+
+        </ul>
+        <hr/>
+        <p>About This App</p>
+    </div>
+</div>
