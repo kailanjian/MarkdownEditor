@@ -4,7 +4,6 @@ const RESIZE_BAR_WIDTH = 5;
 // variables
 var inputBoxRelativeSize = 0.5;
 
-
 // initialize the editor
 var editor = CodeMirror.fromTextArea(document.getElementById("input-box"), {
     mode: "markdown",
@@ -36,6 +35,7 @@ $(function () {
     $(window).on('resize', resizeViews);
 
     bindMenu();
+
 
     // bind save button
     $("#save-md").click(function () {
@@ -69,23 +69,49 @@ $(function () {
         }
     });
 
+    $("#share-link-write").click(function () {
+        let perm = $("#view-data-perm").text();
+        if (perm == "write") {
+            alert("Use current URL to access current document again:\n" + document.URL);
+        } else {
+            alert("You don't have permission to edit this document. You can edit a copy instead!\nAlternatively contact the owner and ask for the edit link");
+        }
+    });
 
-    $("#share-link-read").click(function () {
-        let text = editor.getValue();
-        $.ajax({
-            url: "/Home/SaveNewDocument",
-            method: "POST",
-            contentType: "application/json;charset=utf-8",
-            data: '"' + text + '"'
-        }).error(function (xhr, textStatus, errorThrown) {
-            console.log(JSON.stringify(errorThrown));
-            console.log(textStatus);
-        }).done(function (data) {
-            console.log(JSON.stringify(data));
-            let base_url = window.location.host;
-            let path = "/Home/Document/" + data;
-            alert("your link is: " + base_url + path)
-        });
+    $("#save-cloud").click(function () {
+        // check if we are currently editing a document
+        if ($("#view-data-id").text() != "") {
+            let id = $("#view-data-id").text();
+            let text = editor.getValue();
+            $.ajax({
+                url: "/Home/SaveDocument",
+                method: "POST",
+                contentType: "application/json;charset=utf-8",
+                data: '"' + id + '\n' + text + '"'
+            }).error(function (xhr, textStatus, errorThrown) {
+                console.log(JSON.stringify(errorThrown));
+                console.log(textStatus);
+            }).done(function (data) {
+                console.log("successfully saved" + data);
+            });
+        } else {
+            let text = editor.getValue();
+            $.ajax({
+                url: "/Home/SaveNewDocument",
+                method: "POST",
+                contentType: "application/json;charset=utf-8",
+                data: '"' + text + '"'
+            }).error(function (xhr, textStatus, errorThrown) {
+                console.log(JSON.stringify(errorThrown));
+                console.log(textStatus);
+            }).done(function (data) {
+                console.log(JSON.stringify(data));
+                let base_url = window.location.origin;
+                let path = "/Home/EditDocument/" + data;
+                window.location.assign(base_url + path);
+                alert("New document created in the cloud!\nLink to edit: " + base_url + path);
+            });
+        }
     });
     //bind title rename
     bindTitleRename();

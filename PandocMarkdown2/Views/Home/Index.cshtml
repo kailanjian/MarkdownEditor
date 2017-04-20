@@ -2,6 +2,13 @@
     ViewData["Title"] = "Home Page";
 }
 
+
+<div class="view-data-holder" hidden>
+    <div id="view-data-id">@ViewData["id"]</div>
+    <!--Note: This cannot simply be changed to upgrade perms since a 
+        valid id is needed as well, simply a convenience value-->
+    <div id="view-data-perm">@ViewData["perm"]</div>
+</div>
 <div class="main-top">
     <div class="menu-open-button"><i class="glyphicon glyphicon-menu-right" ></i></div>
     <div class="document-title">
@@ -51,8 +58,9 @@
         <br />
         <p class="menu-list-title">Share...</p>
         <ul class="menu-list share-list">
-            <li><button id="share-link-read">Get Sharable Link (Readonly)</button></li>
-            <li>Get Sharable Link (Read/Write)</li>
+            <li><button id="save-cloud">Save To Cloud</button></li>
+            <li><button id="share-link-read">Get Link (Readonly)</button></li>
+            <li><button id="share-link-write">Get Link (Read/Write)</button></li>
         </ul>
         <hr />
         <p class="menu-list-title">Recent</p>

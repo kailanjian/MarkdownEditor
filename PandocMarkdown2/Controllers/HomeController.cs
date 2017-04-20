@@ -30,9 +30,8 @@ namespace PandocMarkdown2.Controllers
         }
 
         // GET: document/5
-        //[HttpGet("{id}", Name = "GetDocument")]
-        //[Route("{id}")]
-        public IActionResult Document(string id)
+        //[HttpGet("Edit/Document", Name = "Document")]
+        public IActionResult EditDocument(string id)
         {
             string text = "failed to read";
             using (FileStream fs = SystemFile.OpenRead("Documents/" + id + ".md"))
@@ -41,6 +40,8 @@ namespace PandocMarkdown2.Controllers
                 text = sr.ReadToEnd();
             }
             ViewData["text"] = text;
+            ViewData["id"] = id;
+            ViewData["perm"] = "write";
             return View("Index");
         }
 
@@ -50,6 +51,7 @@ namespace PandocMarkdown2.Controllers
             // Save document
             string id = Guid.NewGuid().ToString();
             string filename = id + ".md";
+
             using (FileStream fs = SystemFile.Create("Documents/" + filename))
             using (StreamWriter sw = new StreamWriter(fs))
             {
@@ -59,16 +61,20 @@ namespace PandocMarkdown2.Controllers
         }
 
 
+
+        
         [HttpPost]
         public string SaveDocument([FromBody] string documentText)
         {
-            // Save document
-            string id = Guid.NewGuid().ToString();
-            string filename = id + ".md";
-            using (FileStream fs = SystemFile.Create(filename))
+            // by arbitrary standard, first line is guid, and rest is body of text
+            string id = documentText.Substring(0, documentText.IndexOf('\n'));
+            string text = documentText.Substring(documentText.IndexOf('\n') + 1);
+
+            string filename = "Documents/" + id + ".md";
+            using (FileStream fs = SystemFile.OpenWrite(filename))
             using (StreamWriter sw = new StreamWriter(fs))
             {
-                sw.Write(documentText);
+                sw.Write(text);
             }
             return id;
         }
