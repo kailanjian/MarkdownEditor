@@ -48,6 +48,7 @@ namespace PandocMarkdown2.Controllers
 
             psi.RedirectStandardOutput = true;
             psi.RedirectStandardInput = true;
+            psi.StandardOutputEncoding = System.Text.Encoding.UTF8;
 
             Process p = new Process();
             p.StartInfo = psi;
@@ -60,7 +61,7 @@ namespace PandocMarkdown2.Controllers
             p.StandardInput.Dispose();
 
             p.WaitForExit(5000);
-            using (System.IO.StreamReader sr = new System.IO.StreamReader(p.StandardOutput.BaseStream))
+            using (StreamReader sr = new StreamReader(p.StandardOutput.BaseStream, Encoding.UTF8))
             {
                 outputString = sr.ReadToEnd();
             }
@@ -79,5 +80,7 @@ namespace PandocMarkdown2.Controllers
         public void Delete(int id)
         {
         }
+
+        // TODO: move to utility class
     }
 }

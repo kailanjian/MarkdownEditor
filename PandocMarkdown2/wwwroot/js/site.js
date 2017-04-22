@@ -28,9 +28,14 @@ $(function () {
             console.log("dragged to x " + ui.position.left);
             $("#input").width(ui.position.left);
             $("#output").width($(window).width() - ui.position.left - RESIZE_BAR_WIDTH);
+
+            if (ui.position.left > $(window).width() - 25) {
+                $(".resize-bar")
+            }
         },
         scroll: false
     });
+
 
     $(window).on('resize', resizeViews);
 
@@ -71,7 +76,7 @@ $(function () {
 
     $("#share-link-write").click(function () {
         let perm = $("#view-data-perm").text();
-        if (perm == "write") {
+        if (perm === "write") {
             alert("Use current URL to access current document again:\n" + document.URL);
         } else {
             alert("You don't have permission to edit this document. You can edit a copy instead!\nAlternatively contact the owner and ask for the edit link");
@@ -80,7 +85,7 @@ $(function () {
 
     $("#save-cloud").click(function () {
         // check if we are currently editing a document
-        if ($("#view-data-id").text() != "") {
+        if ($("#view-data-id").text() !== "") {
             let id = $("#view-data-id").text();
             let text = editor.getValue();
             $.ajax({
@@ -141,7 +146,7 @@ function convertInput() {
         url: "/api/Convert",
         method: "POST",
         contentType: "application/json;charset=utf-8",
-        data: '"' + inText + '"'
+        data: JSON.stringify(inText)
     }).error(function (xhr, textStatus, errorThrown) {
         console.log(JSON.stringify(errorThrown));
         console.log(textStatus);
@@ -184,7 +189,7 @@ function bindTitleRename() {
 
     $("#document-title-input").blur(showDisplay);
     $("#document-title-input").bind('keypress', function (e) {
-        if (e.keyCode == 13) {
+        if (e.keyCode === 13) {
             showDisplay();
         }
     });
