@@ -20,21 +20,9 @@ $(function () {
     editor.on("change", convertInput);
 
     updateViews();
-    $(".resize-bar").draggable({
-        drag: function (event, ui) {
-            ui.position.top = $(".main").position().top;
-            ui.position.left = Math.max(0, ui.position.left);
-            ui.position.left = Math.min($(window).width() - RESIZE_BAR_WIDTH, ui.position.left);
-            console.log("dragged to x " + ui.position.left);
-            $("#input").width(ui.position.left);
-            $("#output").width($(window).width() - ui.position.left - RESIZE_BAR_WIDTH);
 
-            if (ui.position.left > $(window).width() - 25) {
-                $(".resize-bar")
-            }
-        },
-        scroll: false
-    });
+    bindResizeBar();
+
 
 
     $(window).on('resize', resizeViews);
@@ -207,8 +195,66 @@ function setTitle(title) {
 }
 
 function addSlashes(str) {
-    str = str.replace(/'/g, "\\'");
+    //str = str.replace(/'/g, "\\'");
     str = str.replace(/\\/g, "\\\\");
     str = str.replace(/\"/g, "\\\"");
     return str;
+}
+
+function bindResizeBar() {
+    modes = {
+        VIEW: "view",
+        EDIT: "edit",
+        NORMAL: "normal"
+    };
+
+    let currentMode = modes.VIEW;
+
+    $(".resize-bar").draggable({
+        drag: function (event, ui) {
+            ui.position.top = $(".main").position().top;
+            ui.position.left = Math.max(0, ui.position.left);
+            ui.position.left = Math.min($(window).width() - RESIZE_BAR_WIDTH, ui.position.left);
+            $("#input").width(ui.position.left);
+            $("#output").width($(window).width() - ui.position.left - RESIZE_BAR_WIDTH);
+
+            if (ui.position.left > $(window).width() - 50) {
+                console.log("trying to snap");
+                setMode(modes.EDIT, ui);
+                $("#input").width($(window).width());
+                $("#output").hide();
+                return;
+            } else if (ui.position.left < 50) {
+                console.log("trying to snap (left)");
+                setMode(modes.VIEW, ui);
+                $("#input").hide();
+                $("#output").width($(window).width());
+            } else {
+                setMode(modes.NORMAL, ui);
+                $("#input").show();
+                $("#output").show();
+            }
+        },
+        scroll: false
+    });
+
+    function setMode(mode, ui) {
+        console.log("set mode");
+        console.log("setting mode to: " + mode);
+        currentMode = mode;
+        if (mode === modes.EDIT) {
+            $(".resize-bar").width(30);
+            $(".resize-text").text("VIEW 🢃");
+            ui.position.left = $(window).width() - 30;
+        } else if (mode === modes.VIEW) {
+            console.log("setting to edit mode");
+            $(".resize-bar").width(30);
+            $(".resize-text").text("EDIT 🢁");
+            ui.position.left = 0;
+        } else if (mode === modes.NORMAL) {
+            $(".resize-bar").width(5);
+            $(".resize-text").text("");
+        }
+    }
+    
 }

@@ -99,6 +99,14 @@ body,html {
     background-color: var(--dark-color);
     cursor: col-resize;
     position: absolute;
+    z-index: 100;
+}
+
+.resize-text {
+    margin-top: 20px;
+    transform: rotate(90deg);
+    color: white;
+    white-space: nowrap;
 }
 
 #output {
