@@ -41,7 +41,11 @@ namespace PandocMarkdown2.Controllers
             {
                 text = sr.ReadToEnd();
             }
+            string title = "Untitled";
+            title = text.Substring(0, text.IndexOf('\n'));
+            text = text.Substring(text.IndexOf('\n') + 1);
             ViewData["text"] = text;
+            ViewData["document-title"] = title;
             ViewData["id"] = id;
             ViewData["perm"] = "write";
             return View("Index");
@@ -79,6 +83,7 @@ namespace PandocMarkdown2.Controllers
             using (StreamWriter sw = new StreamWriter(fs))
             {
                 sw.Write(text);
+                
             }
             return id;
         }

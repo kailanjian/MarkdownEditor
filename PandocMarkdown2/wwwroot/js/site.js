@@ -41,6 +41,11 @@ $(function () {
 
     bindMenu();
 
+    convertInput();
+
+    if ($("#view-data-document-title").text() != "") {
+        setTitle($("#view-data-document-title").text());
+    }
 
     // bind save button
     $("#save-md").click(function () {
@@ -85,14 +90,16 @@ $(function () {
 
     $("#save-cloud").click(function () {
         // check if we are currently editing a document
+        let title = $("#document-title-display").text();
+        let text = addSlashes(editor.getValue());
+        console.log("Sending: " + text);
         if ($("#view-data-id").text() !== "") {
             let id = $("#view-data-id").text();
-            let text = editor.getValue();
             $.ajax({
                 url: "/Home/SaveDocument",
                 method: "POST",
                 contentType: "application/json;charset=utf-8",
-                data: '"' + id + '\n' + text + '"'
+                data: '"' + id + '\n' + title + '\n' + text + '"'
             }).error(function (xhr, textStatus, errorThrown) {
                 console.log(JSON.stringify(errorThrown));
                 console.log(textStatus);
@@ -100,12 +107,11 @@ $(function () {
                 console.log("successfully saved" + data);
             });
         } else {
-            let text = editor.getValue();
             $.ajax({
                 url: "/Home/SaveNewDocument",
                 method: "POST",
                 contentType: "application/json;charset=utf-8",
-                data: '"' + text + '"'
+                data: '"' + title +'\n' + text + '"'
             }).error(function (xhr, textStatus, errorThrown) {
                 console.log(JSON.stringify(errorThrown));
                 console.log(textStatus);
@@ -193,4 +199,16 @@ function bindTitleRename() {
             showDisplay();
         }
     });
+}
+
+function setTitle(title) {
+    $("#document-title-input").val(title);
+    $("#document-title-display").text(title);
+}
+
+function addSlashes(str) {
+    str = str.replace(/'/g, "\\'");
+    str = str.replace(/\\/g, "\\\\");
+    str = str.replace(/\"/g, "\\\"");
+    return str;
 }
