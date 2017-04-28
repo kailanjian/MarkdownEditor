@@ -2,7 +2,7 @@
     ViewData["Title"] = "Home Page";
 }
 
-
+<div id="flash-message">Sample Text Please Ignore</div>
 <div class="view-data-holder" hidden>
     <div id="view-data-id">@ViewData["id"]</div>
     <!--Note: This cannot simply be changed to upgrade perms since a 
@@ -15,6 +15,9 @@
     <div class="document-title">
         <p id="document-title-display">Untitled</p>
         <input id="document-title-input" type="text" style="display: none" value="Untitled"/>
+    </div>
+    <div class="buttons-bar">
+        <button id="top-save-button">Save</button>
     </div>
     <div class="title"><i>Pandoc Markdown</i></div>
 </div>

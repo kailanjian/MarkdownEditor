@@ -13,22 +13,19 @@ var editor = CodeMirror.fromTextArea(document.getElementById("input-box"), {
     keyMap: "vim"
 });
 
-// jQuery document load here
+// jQuery document loads here
 $(function () {
-    // $("#compile-button").click(convertInput);
-    // $("#input-box").bind('input propertychange', convertInput);
+
+    // bind the editor to recompute output on keypress(every time a new character is entered)
     editor.on("change", convertInput);
 
+    // update the view initially.
     updateViews();
 
-    bindResizeBar();
-
-
-
+    // update on resizing
     $(window).on('resize', resizeViews);
 
-    bindMenu();
-
+    // run convert input initially in case the editor has something loaded from backend on page load.
     convertInput();
 
     if ($("#view-data-document-title").text() != "") {
@@ -37,19 +34,18 @@ $(function () {
 
     // bind save button
     $("#save-md").click(function () {
-        //download(editor.getValue(), "file.md", "text/plain");w:w
-
         let fileName = $("#document-title-display").text();
 
         var blob = new Blob([editor.getValue()], { type: "text/plain;" });
         saveAs(blob, fileName + ".md");
     });
 
-    // bind open button
+    // bind open file button
     $("#open-md").on("click", function () {
         $("#markdown-file-input").trigger("click");
     });
 
+    // Handle load document from local
     $("#markdown-file-input").change(function () {
         console.log("file opened");
         let input = document.getElementById("markdown-file-input");
@@ -67,6 +63,8 @@ $(function () {
         }
     });
 
+    // TODO: move to separate function (event binding function)
+    // Event handler for sharing the link
     $("#share-link-write").click(function () {
         let perm = $("#view-data-perm").text();
         if (perm === "write") {
@@ -76,131 +74,136 @@ $(function () {
         }
     });
 
-    $("#save-cloud").click(function () {
-        // check if we are currently editing a document
-        let title = $("#document-title-display").text();
-        let text = addSlashes(editor.getValue());
-        console.log("Sending: " + text);
-        if ($("#view-data-id").text() !== "") {
-            let id = $("#view-data-id").text();
-            $.ajax({
-                url: "/Home/SaveDocument",
-                method: "POST",
-                contentType: "application/json;charset=utf-8",
-                data: '"' + id + '\n' + title + '\n' + text + '"'
-            }).error(function (xhr, textStatus, errorThrown) {
-                console.log(JSON.stringify(errorThrown));
-                console.log(textStatus);
-            }).done(function (data) {
-                console.log("successfully saved" + data);
-            });
-        } else {
-            $.ajax({
-                url: "/Home/SaveNewDocument",
-                method: "POST",
-                contentType: "application/json;charset=utf-8",
-                data: '"' + title +'\n' + text + '"'
-            }).error(function (xhr, textStatus, errorThrown) {
-                console.log(JSON.stringify(errorThrown));
-                console.log(textStatus);
-            }).done(function (data) {
-                console.log(JSON.stringify(data));
-                let base_url = window.location.origin;
-                let path = "/Home/EditDocument/" + data;
-                window.location.assign(base_url + path);
-                alert("New document created in the cloud!\nLink to edit: " + base_url + path);
-            });
-        }
-    });
-    //bind title rename
+
+    // bind event handlers to document on page load
+    bindSave();
     bindTitleRename();
+    bindResizeBar();
+    bindMenu();
 
 });
 
+// function to reset the views upon resize
 function updateViews() {
+    // TODO: doesn't really work as intended because proportions are never modified in the other functions
+
+    // get window width and compute where the resize bar should be.
     let windowWidth = $(window).width();
     let resizeBarOffset = inputBoxRelativeSize * windowWidth;
+
+    // input and output box widths are set relative to current position of resize bar.
     $("#input").width(inputBoxRelativeSize * windowWidth);
     $("#output").width(windowWidth - RESIZE_BAR_WIDTH - inputBoxRelativeSize * windowWidth);
+
+    // resize bar is set based on offset and height is updated.
     $(".resize-bar").css("left", resizeBarOffset);
     $(".resize-bar").css("height", $(".main").height());
+    
 }
 
+// change views on resize
 function resizeViews() {
+    // output width is set relative to input width and window width.
     $("#output").width($(window).width() - $("#input").width() - RESIZE_BAR_WIDTH);
 }
 
-
-
+// Converts input using backend Pandoc converter
 function convertInput() {
-    //let inText = $("#input-box").val();
     let inText = editor.getValue();
+
     console.log(inText);
+
+    // posts the contents of the editor to converter and gets
+    // converted HTML back.
     $.ajax({
         url: "/api/Convert",
         method: "POST",
         contentType: "application/json;charset=utf-8",
         data: JSON.stringify(inText)
     }).error(function (xhr, textStatus, errorThrown) {
+
         console.log(JSON.stringify(errorThrown));
         console.log(textStatus);
-    }).done(function (data) {
+
+    }).done(function (data) {   
+
         console.log(JSON.stringify(data));
+
+        // set output container to render generated html
         $(".html-container").html(data);
+
     });
 }
 
+// code to handle the menu
 function bindMenu() {
 
     // set menu initially hidden on the side
     let menuWidth = $(".menu").outerWidth();
     $(".menu").css("left", -1*menuWidth);
 
+    // bind click to shifting menu left (close)
     $(".menu-close-button").click(function () {
         let menuWidth = $(".menu").outerWidth();
         $(".menu").animate({ left: -1 * menuWidth });
     });
 
+    // bind click to shifting menu right (open)
     $(".menu-open-button").click(function () {
         $(".menu").animate({ left: 0 });
     })
 }
+
+// title renaming function
 function bindTitleRename() {
+    // TODO: highlight text upon begin edit for easier modifications
+
+    // Hide display, show input box instead.
     function showInput() {
+
         $("#document-title-display").hide();
         $("#document-title-input").show();
         $("#document-title-input").focus();
 
     }
 
+    // Hide input box, show display (update text for display too)
     function showDisplay() {
+
         $("#document-title-display").show();
         $("#document-title-input").hide();
         $("#document-title-display").text($("#document-title-input").val())
+
     }
 
+    // binding of events
     $("#document-title-display").click(showInput);
 
     $("#document-title-input").blur(showDisplay);
     $("#document-title-input").bind('keypress', function (e) {
+        // to handle enter key
         if (e.keyCode === 13) {
             showDisplay();
         }
     });
 }
 
+// change the title by changing both input and display
 function setTitle(title) {
     $("#document-title-input").val(title);
     $("#document-title-display").text(title);
 }
 
-function addSlashes(str) {
+// add slashes so escaped backslashes and backslashed characters save correctly.
+function addSlashes(str) { 
+    // don't need apostrophe's because we use quotes for strings and JS handles apostrophe's correctly
     //str = str.replace(/'/g, "\\'");
     str = str.replace(/\\/g, "\\\\");
     str = str.replace(/\"/g, "\\\"");
     return str;
 }
 
+// resize bar functionality
 function bindResizeBar() {
     modes = {
         VIEW: "view",
@@ -210,6 +213,7 @@ function bindResizeBar() {
 
     let currentMode = modes.VIEW;
 
+    // Use jquery UI to adjust positions of items in document based on resize bar location.
     $(".resize-bar").draggable({
         drag: function (event, ui) {
             ui.position.top = $(".main").position().top;
@@ -238,6 +242,7 @@ function bindResizeBar() {
         scroll: false
     });
 
+    // snapping to sides
     function setMode(mode, ui) {
         console.log("set mode");
         console.log("setting mode to: " + mode);
@@ -257,4 +262,66 @@ function bindResizeBar() {
         }
     }
     
+}
+
+// popus up the flash-message div briefly (can be used for notifications, like for saving);
+function flashMessage(str) {
+    $("#flash-message").text(str);
+    $("#flash-message").show();
+    $("#flash-message").delay(300).fadeOut(400, "swing");
+}
+
+// binds save buttons
+function bindSave() {
+    function saveSuccess() {
+        flashMessage("Saved!");
+    }
+
+    function saveError() {
+
+    }
+    function save() {
+        // check if we are currently editing a document
+        let title = $("#document-title-display").text();
+        let text = addSlashes(editor.getValue());
+        console.log("Sending: " + text);
+        if ($("#view-data-id").text() !== "") {
+            let id = $("#view-data-id").text();
+            // post to save page endpoint the data
+            $.ajax({
+                url: "/Home/SaveDocument",
+                method: "POST",
+                contentType: "application/json;charset=utf-8",
+                // post id (for auth), title, then text. Backend will parse this.
+                data: '"' + id + '\n' + title + '\n' + text + '"'
+            }).error(function (xhr, textStatus, errorThrown) {
+                console.log(JSON.stringify(errorThrown));
+                console.log(textStatus);
+            }).done(function (data) {
+                console.log("successfully saved" + data);
+                saveSuccess()
+            });
+        } else {
+            // post to new document endpoint to actually generate new file.
+            $.ajax({
+                url: "/Home/SaveNewDocument",
+                method: "POST",
+                contentType: "application/json;charset=utf-8",
+                data: '"' + title +'\n' + text + '"'
+            }).error(function (xhr, textStatus, errorThrown) {
+                console.log(JSON.stringify(errorThrown));
+                console.log(textStatus);
+            }).done(function (data) {
+                console.log(JSON.stringify(data));
+                let base_url = window.location.origin;
+                let path = "/Home/EditDocument/" + data;
+                window.location.assign(base_url + path);
+                alert("New document created in the cloud!\nLink to edit: " + base_url + path);
+                saveSuccess();
+            });
+        }
+    }
+
+    $("#save-cloud").click(save);
+    $("#top-save-button").click(save);
 }

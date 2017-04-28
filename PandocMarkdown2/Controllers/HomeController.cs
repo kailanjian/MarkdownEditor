@@ -36,14 +36,21 @@ namespace PandocMarkdown2.Controllers
         public IActionResult EditDocument(string id)
         {
             string text = "failed to read";
+
+            // open document based on hash of id.
             using (FileStream fs = SystemFile.OpenRead("Documents/" + GenerateHash(id) + ".md"))
             using (StreamReader sr = new StreamReader(fs))
             {
                 text = sr.ReadToEnd();
             }
+
             string title = "Untitled";
+
+            // get title and text from file.
             title = text.Substring(0, text.IndexOf('\n'));
             text = text.Substring(text.IndexOf('\n') + 1);
+
+            // set view datas so view can get data from backend
             ViewData["text"] = text;
             ViewData["document-title"] = title;
             ViewData["id"] = id;
@@ -59,6 +66,7 @@ namespace PandocMarkdown2.Controllers
             string hash = GenerateHash(id);
             string filename = hash + ".md";
 
+            // Create a new document and write to it
             using (FileStream fs = SystemFile.Create("Documents/" + filename))
             using (StreamWriter sw = new StreamWriter(fs))
             {
@@ -78,6 +86,7 @@ namespace PandocMarkdown2.Controllers
             // TODO check if id is valid incase someone tries to screw with the api
             string text = documentText.Substring(documentText.IndexOf('\n') + 1);
 
+            // write to the existing document
             string filename = "Documents/" + GenerateHash(id) + ".md";
             using (FileStream fs = SystemFile.OpenWrite(filename))
             using (StreamWriter sw = new StreamWriter(fs))
