@@ -13,6 +13,7 @@ var editor = CodeMirror.fromTextArea(document.getElementById("input-box"), {
     keyMap: "vim"
 });
 
+
 // jQuery document loads here
 $(function () {
 
@@ -85,7 +86,6 @@ $(function () {
 
 // function to reset the views upon resize
 function updateViews() {
-    // TODO: doesn't really work as intended because proportions are never modified in the other functions
 
     // get window width and compute where the resize bar should be.
     let windowWidth = $(window).width();
@@ -280,6 +280,7 @@ function bindSave() {
     function saveError() {
 
     }
+    
     function save() {
         // check if we are currently editing a document
         let title = $("#document-title-display").text();

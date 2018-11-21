@@ -8,12 +8,12 @@
     <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8+wp8+wpa81;</PackageTargetFallback>
   </PropertyGroup>
 
-  <ItemGroup>
+  <!--<ItemGroup>
     <Content Include="wwwroot\lib\codemirror\codemirror.css" />
     <Content Include="wwwroot\lib\codemirror\codemirror.js" />
     <Content Include="wwwroot\lib\codemirror\keymap\vim.js" />
     <Content Include="wwwroot\lib\codemirror\mode\markdown.js" />
-  </ItemGroup>
+  </ItemGroup>-->
   <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore" Version="1.1.1" />
