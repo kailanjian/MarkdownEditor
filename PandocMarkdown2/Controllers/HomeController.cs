@@ -17,8 +17,7 @@ namespace PandocMarkdown2.Controllers
             return View();
         }
 
-        // GET: document/5
-        //[HttpGet("Edit/Document", Name = "Document")]
+        // GET: /Home/EditDocument/:id
         public IActionResult EditDocument(string id)
         {
             string text = "failed to read";
@@ -44,6 +43,7 @@ namespace PandocMarkdown2.Controllers
             return View("Index");
         }
 
+        // POST /Home/SaveNewDocument
         [HttpPost]
         public string SaveNewDocument([FromBody] string documentText)
         {
@@ -61,12 +61,13 @@ namespace PandocMarkdown2.Controllers
             return id;
         }
 
+        // POST /Home/SaveDocument
         [HttpPost]
         public string SaveDocument([FromBody] string documentText)
         {
             // by arbitrary standard, first line is guid, and rest is body of text
             string id = documentText.Substring(0, documentText.IndexOf('\n'));
-            // TODO check if id is valid incase someone tries to screw with the api
+            // TODO check if id is valid incase someone tries to mess with the api
             string text = documentText.Substring(documentText.IndexOf('\n') + 1);
 
             // write to the existing document
@@ -85,24 +86,31 @@ namespace PandocMarkdown2.Controllers
             return View();
         }
 
-        // TODO: move this stuff to model
+        // Black-box method to generate a page id
         private string GenerateId()
         {
             // update this super complex algorithm to be more super complex and secure
-            // TODO: use cryptographic RNG instead because apparently GUID is not very secure
+            // TODO: use built cryptographic RNG instead because GUID is not very secure
             return Guid.NewGuid().ToString();
         }
 
+        // Black-box hashing function, will need to recompute all file names if this is changed!
         private string GenerateHash(string id)
         {
+            // Convert to bytes
             byte[] bytes = Encoding.UTF8.GetBytes(id);
+            
+            // Use built in hashing function to get hash
             HMACSHA256 hashString = new HMACSHA256(new byte[] { 42 });
             byte[] hash = hashString.ComputeHash(bytes);
             string hashResult = "";
+            
+            // Combine hashed hex values into single string
             foreach (byte x in hash)
             {
                 hashResult += String.Format("{0:x2}", x);
             }
+            
             return hashResult;
 
         }
